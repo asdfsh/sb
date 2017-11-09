@@ -35,6 +35,7 @@ def extract_time(lines, max_stop):
                     # check if we've changed status or no
                     if arrive_status in expanded_copy[i]:
                         expanded_copy[i].remove(arrive_status)
+                        continue
                     # bus hasn't arrived yet 
                     if arrive_status == 0:
                         # if it arrived
