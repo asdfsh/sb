@@ -1,4 +1,5 @@
 import unittest
+# coding:utf-8
 import bus
 
 class Tests(unittest.TestCase):
@@ -9,13 +10,20 @@ class Tests(unittest.TestCase):
         self.assertEqual(arrives, [[],[],[],[]])
         self.assertEqual(departs, [[],['2017-11-03 15:52:47'],[],[]])
 
-    def test_new(self):
+    def test_initial (self):
         lines = ['801,0,1,0,2,2017-11-03 15:52:47',
                  '801,0,1,0,3,2017-11-03 15:52:47']
         arrives, departs = bus.extract_time(lines,3)
         self.assertEqual(arrives, [[],[],[],[]])
         self.assertEqual(departs, [[],[],['2017-11-03 15:52:47'],['2017-11-03 15:52:47']])
-    
+    #初始数据 到达信息为0 则是刚刚离开上一站initial
+    def test_initial2 (self):
+        lines = ['801,1,1,0,2,2017-11-03 15:52:47',
+                 '801,1,1,0,3,2017-11-03 15:52:47']
+        arrives, departs = bus.extract_time(lines,3)
+        self.assertEqual(arrives, [[],[],['2017-11-03 15:52:47'],['2017-11-03 15:52:47']])
+        self.assertEqual(departs, [[],[],[],[]])
+
     def test_far(self):
         lines = ['801,1,1,0,1,2017-11-03 15:52:32',
                  '801,1,1,0,3,2017-11-03 15:52:32',
