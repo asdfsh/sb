@@ -24,6 +24,14 @@ class Tests(unittest.TestCase):
         self.assertEqual(arrives, [[],[],['2017-11-03 15:52:47'],['2017-11-03 15:52:47']])
         self.assertEqual(departs, [[],[],[],[]])
 
+    def test_final(self):
+        lines = ['801,1,1,0,2,2017-11-03 15:52:47',
+                 '801,0,1,0,3,2017-11-03 15:52:47',
+                 '801,1,1,0,2,2017-11-03 15:52:57', ]
+        arrives, departs = bus.extract_time(lines, 3)
+        self.assertEqual(arrives, [[], [], ['2017-11-03 15:52:47'], ['2017-11-03 15:52:57']])
+        self.assertEqual(departs, [[], [], [], []])
+    #假设第三站是最后一站，而47秒是公交消失前的最后一条记录，所以公交57秒假设公交恰好到终点站，此时公交消失
     def test_far(self):
         lines = ['801,1,1,0,1,2017-11-03 15:52:32',
                  '801,1,1,0,3,2017-11-03 15:52:32',
