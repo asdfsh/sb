@@ -8,6 +8,13 @@ class Tests(unittest.TestCase):
         arrives, departs = bus.extract_time(lines,3)
         self.assertEqual(arrives, [[],[],[],[]])
         self.assertEqual(departs, [[],['2017-11-03 15:52:47'],[],[]])
+
+    def test_new(self):
+        lines = ['801,0,1,0,2,2017-11-03 15:52:47',
+                 '801,0,1,0,3,2017-11-03 15:52:47']
+        arrives, departs = bus.extract_time(lines,3)
+        self.assertEqual(arrives, [[],[],[],[]])
+        self.assertEqual(departs, [[],[],['2017-11-03 15:52:47'],['2017-11-03 15:52:47']])
     
     def test_far(self):
         lines = ['801,1,1,0,1,2017-11-03 15:52:32',
