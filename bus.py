@@ -4,7 +4,7 @@ def extract_time(lines, max_stop):
     expanded_list = []
     cur_expanded = [ [] for i in range(0, max_stop+1)]
     prev_time = None
-    prev_NO = None
+
     arrives = [[] for i in range(0, max_stop + 1)]
     departs = [[] for i in range(0, max_stop + 1)]
     for line in lines:
@@ -12,9 +12,7 @@ def extract_time(lines, max_stop):
         if not line:
             continue
         NO, arrived, nums, direction, stop, cur_time = line.split(',')
-        #if prev_NO is None:
-        #   prev_NO=NO
-        #if prev_NO !=NO:
+
 
 
         if prev_time is None:
@@ -22,7 +20,10 @@ def extract_time(lines, max_stop):
             initial_time=cur_time
 
         if cur_time == initial_time:
-            departs[int(stop)].append(cur_time)
+            if int(arrived) == 1:
+                arrives[int(stop)].append(cur_time)
+            else:
+                departs[int(stop)].append(cur_time)
         if prev_time != cur_time:
             expanded_list.append(cur_expanded)
             cur_expanded = [[] for i in range(0, max_stop+1)]
@@ -40,7 +41,7 @@ def extract_time(lines, max_stop):
     for expanded in expanded_list:
         expanded_copy = copy.deepcopy(expanded)
         for i in range(1, max_stop+1):
-            #if prev is None:
+
 
             if prev[i]:
                 prev[i].sort()
@@ -76,7 +77,7 @@ if __name__ == '__main__':
     lines = []
     with open('buslian2.txt') as f:
         lines = f.readlines()
-    max_stop = 7
+    max_stop = 41
     arrives, departs = extract_time(lines, max_stop)
     print "arrive times"
     for i in range(1, max_stop + 1):
