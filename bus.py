@@ -4,13 +4,25 @@ def extract_time(lines, max_stop):
     expanded_list = []
     cur_expanded = [ [] for i in range(0, max_stop+1)]
     prev_time = None
+    prev_NO = None
+    arrives = [[] for i in range(0, max_stop + 1)]
+    departs = [[] for i in range(0, max_stop + 1)]
     for line in lines:
         line = line.strip()
         if not line:
             continue
-        _, arrived, nums, direction, stop, cur_time = line.split(',')
+        NO, arrived, nums, direction, stop, cur_time = line.split(',')
+        #if prev_NO is None:
+        #   prev_NO=NO
+        #if prev_NO !=NO:
+
+
         if prev_time is None:
             prev_time = cur_time
+            initial_time=cur_time
+
+        if cur_time == initial_time:
+            departs[int(stop)].append(cur_time)
         if prev_time != cur_time:
             expanded_list.append(cur_expanded)
             cur_expanded = [[] for i in range(0, max_stop+1)]
@@ -22,13 +34,14 @@ def extract_time(lines, max_stop):
     if prev_time:
         expanded_list.append(cur_expanded)
 
-    arrives = [[] for i in range(0, max_stop+1)]
-    departs = [[] for i in range(0, max_stop+1)]
+
     # TODO: should adjust prev based on expanded_list[0]
     prev = [None for i in range(0, max_stop+1)]
     for expanded in expanded_list:
         expanded_copy = copy.deepcopy(expanded)
         for i in range(1, max_stop+1):
+            #if prev is None:
+
             if prev[i]:
                 prev[i].sort()
                 for arrive_status in prev[i]:
