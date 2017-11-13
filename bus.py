@@ -23,7 +23,7 @@ def extract_time(lines, max_stop):
             if int(arrived) == 1:
                 arrives[int(stop)].append(cur_time)
             else:
-                departs[int(stop)].append(cur_time)
+                departs[int(stop)-1].append(cur_time)
         if prev_time != cur_time:
             expanded_list.append(cur_expanded)
             cur_expanded = [[] for i in range(0, max_stop+1)]
@@ -72,13 +72,22 @@ def extract_time(lines, max_stop):
         prev = expanded
 
     return arrives, departs
-
+def cheshi_time(arrives,departs):
+    times = [[] for i in range(0, max_stop + 1)]
+    for i in range(0, max_stop):
+        for arrive, depart in zip(arrives[i], departs[i + 1]):
+            hour1, minute1, second1 =arrive.split()[1].spit(':')
+            hour2, minute2, second2 = arrive.split()[1].spit(':')
+            time = (int(hour1)-int(hour2))*360+(int(minute1)-int(minute2))*60+(int(second1)-int(second2))
+            times[i].append(time)
+    return times
 if __name__ == '__main__':
     lines = []
     with open('buslian2.txt') as f:
         lines = f.readlines()
-    max_stop = 41
+    max_stop = 7
     arrives, departs = extract_time(lines, max_stop)
+    times=cheshi_time(arrives,departs)
     print "arrive times"
     for i in range(1, max_stop + 1):
         print "terminal %d" % i
@@ -89,3 +98,7 @@ if __name__ == '__main__':
         print "terminal %d" % i
         print departs[i]
 
+    print "process times"
+    for i in range(1, max_stop + 1):
+        print "terminal %d" % i
+        print times[i]
