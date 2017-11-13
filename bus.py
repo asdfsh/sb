@@ -75,9 +75,9 @@ def extract_time(lines, max_stop):
 def cheshi_time(arrives,departs):
     times = [[] for i in range(0, max_stop + 1)]
     for i in range(0, max_stop):
-        for arrive, depart in zip(arrives[i], departs[i + 1]):
-            hour1, minute1, second1 =arrive.split()[1].spit(':')
-            hour2, minute2, second2 = arrive.split()[1].spit(':')
+        for arrive, depart in zip(arrives[i+1], departs[i]):
+            hour1, minute1, second1 =arrive.split()[1].split(':')
+            hour2, minute2, second2 = depart.split()[1].split(':')
             time = (int(hour1)-int(hour2))*360+(int(minute1)-int(minute2))*60+(int(second1)-int(second2))
             times[i].append(time)
     return times
