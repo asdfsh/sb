@@ -42,6 +42,13 @@ def extract_time(lines, max_stop):
         for i in range(0, max_stop):
             if prev[i]:
                 prev[i].sort()
+                # 处理最后一站
+                if i == max_stop - 1:
+                    last_stop_delta = len(prev[i]) - len(expanded_copy[i])
+                    if last_stop_delta > 0: # 有车消失
+                        for _ in range(0, last_stop_delta):
+                            arrives[i].append(time)
+                        continue
                 for arrive_status in prev[i]:
                     # check if we've changed status or no
                     if arrive_status in expanded_copy[i]:
