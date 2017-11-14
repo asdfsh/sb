@@ -1,5 +1,5 @@
 import copy
-
+from datetime import datetime
 def extract_time(lines, max_stop):    
     expanded_list = []
     cur_expanded = [ [] for i in range(0, max_stop+1)]
@@ -20,9 +20,10 @@ def extract_time(lines, max_stop):
             initial_time=cur_time
 
         if cur_time == initial_time:
-            if int(arrived) == 1:
+            for _ in range(0, int(nums)):
+              if int(arrived) == 1:
                 arrives[int(stop)].append(cur_time)
-            else:
+              else:
                 departs[int(stop)-1].append(cur_time)
         if prev_time != cur_time:
             expanded_list.append(cur_expanded)
@@ -72,13 +73,13 @@ def extract_time(lines, max_stop):
         prev = expanded
 
     return arrives, departs
-def cheshi_time(arrives,departs):
+def process_time(arrives,departs):
     times = [[] for i in range(0, max_stop + 1)]
     for i in range(0, max_stop):
         for arrive, depart in zip(arrives[i+1], departs[i]):
-            hour1, minute1, second1 =arrive.split()[1].split(':')
-            hour2, minute2, second2 = depart.split()[1].split(':')
-            time = (int(hour1)-int(hour2))*360+(int(minute1)-int(minute2))*60+(int(second1)-int(second2))
+            TIME = '%Y-%m-%d %H:%M:%S'
+            a =datetime.strptime(arrive,TIME)-datetime.strptime(depart,TIME)
+            time=a.seconds
             times[i].append(time)
     return times
 if __name__ == '__main__':
@@ -87,7 +88,7 @@ if __name__ == '__main__':
         lines = f.readlines()
     max_stop = 7
     arrives, departs = extract_time(lines, max_stop)
-    times=cheshi_time(arrives,departs)
+    times=process_time(arrives,departs)
     print "arrive times"
     for i in range(1, max_stop + 1):
         print "terminal %d" % i
