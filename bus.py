@@ -1,5 +1,5 @@
 import copy
-
+from datetime import datetime
 def extract_time(lines, max_stop):    
     expanded_list = []
     cur_expanded = [ [] for i in range(0, max_stop+1)]
@@ -20,15 +20,16 @@ def extract_time(lines, max_stop):
             initial_time=cur_time
 
         if cur_time == initial_time:
-            if int(arrived) == 1:
+            for _ in range(1, int(nums)+1):
+              if int(arrived) == 1:
                 arrives[int(stop)].append(cur_time)
-            else:
-                departs[int(stop)].append(cur_time)
+              else:
+                departs[int(stop)-1].append(cur_time)
         if prev_time != cur_time:
             expanded_list.append(cur_expanded)
             cur_expanded = [[] for i in range(0, max_stop+1)]
         prev_time = cur_time
-        for i in range(0, int(nums)):
+        for i in range(1, int(nums)+1):
             cur_expanded[int(stop)].append(int(arrived))
             cur_expanded[0] = cur_time
 
@@ -72,13 +73,32 @@ def extract_time(lines, max_stop):
         prev = expanded
 
     return arrives, departs
-
+def process_time(arrives,departs):
+    times = [[] for i in range(0, max_stop + 1)]
+    for i in range(0, max_stop):
+        for arrive, depart in zip(arrives[i+1], departs[i]):
+            TIME = '%Y-%m-%d %H:%M:%S'
+            a =datetime.strptime(arrive,TIME)-datetime.strptime(depart,TIME)
+            time=a.seconds
+            times[i].append(time)
+    return times
+def stay_time(arrives,departs):
+    stimes = [[] for i in range(0, max_stop + 1)]
+    for i in range(0, max_stop):
+        for arrive2, depart2 in zip(arrives[i], departs[i]):
+            TIME = '%Y-%m-%d %H:%M:%S'
+            b =datetime.strptime(depart2,TIME)-datetime.strptime(arrive2,TIME)
+            stime=b.seconds
+            stimes[i].append(stime)
+    return stimes
 if __name__ == '__main__':
     lines = []
     with open('buslian2.txt') as f:
         lines = f.readlines()
-    max_stop = 41
+    max_stop = 5
     arrives, departs = extract_time(lines, max_stop)
+    times=process_time(arrives,departs)
+    stimes=stay_time(arrives,departs)
     print "arrive times"
     for i in range(1, max_stop + 1):
         print "terminal %d" % i
@@ -89,3 +109,12 @@ if __name__ == '__main__':
         print "terminal %d" % i
         print departs[i]
 
+    print "process times"
+    for i in range(1, max_stop + 1):
+        print "terminal %d" % i
+        print times[i]
+
+    print "stay times"
+    for i in range(1, max_stop + 1):
+        print "terminal %d" % i
+        print stimes[i]
