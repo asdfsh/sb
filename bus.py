@@ -82,14 +82,14 @@ def get_time_diff(t1, t2):
     diff = datetime.strptime(t2, TIME) - datetime.strptime(t1, TIME)
     return diff.seconds
 
-def process_time(arrives, departs):
+def process_time(arrives, departs, max_stop):
     times = [[] for _ in range(0, max_stop)]
     for i in range(0, max_stop-1):
         for arrive_next, depart in zip(arrives[i+1], departs[i]):
             times[i].append(get_time_diff(depart, arrive_next))
     return times
 
-def stay_time(arrives, departs):
+def stay_time(arrives, departs, max_stop):
     stimes = [[] for _ in range(0, max_stop)]
     for i in range(0, max_stop):
         for arrive, depart in zip(arrives[i], departs[i]):
@@ -102,8 +102,8 @@ if __name__ == '__main__':
         lines = f.readlines()
     max_stop = 5
     arrives, departs = extract_time(lines, max_stop)
-    times = process_time(arrives,departs)
-    stimes = stay_time(arrives,departs)
+    times = process_time(arrives,departs, max_stop)
+    stimes = stay_time(arrives,departs, max_stop)
     print "arrive times"
     for i in range(1, max_stop + 1):
         print "terminal %d" % i

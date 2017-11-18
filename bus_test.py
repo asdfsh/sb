@@ -119,5 +119,25 @@ class Tests(unittest.TestCase):
         self.assertEqual(arrives, [['2017-11-03 15:52:47', '2017-11-03 15:53:02'], [], []])
         self.assertEqual(departs, [['2017-11-03 15:53:17','2017-11-03 15:53:32'], [], []])
 #有两辆车的时候 程序运行只有一个depart时间
+
+    def test_bug(self):
+        lines = ['801,1,1,0,1,2017-11-03 15:52:32',
+                 '801,1,1,0,3,2017-11-03 15:52:32',
+                 '801,0,1,0,2,2017-11-03 15:52:47',
+                 '801,0,1,0,4,2017-11-03 15:52:47',
+                 '801,1,1,0,2,2017-11-03 15:53:00',
+                 '801,1,1,0,4,2017-11-03 15:53:00',
+                 '801,0,1,0,3,2017-11-03 15:53:10',
+                 '801,0,1,0,5,2017-11-03 15:53:10',
+                 '801,1,1,0,3,2017-11-03 15:53:17',
+                 '801,1,1,0,5,2017-11-03 15:53:17']
+
+        arrives, departs = bus.extract_time(lines, 6)
+        print arrives
+        print departs
+        print bus.process_time(arrives,departs,6)
+        print bus.stay_time(arrives,departs,6)
+
+
 if __name__ == '__main__':
     unittest.main()
