@@ -3,12 +3,10 @@
 import copy
 from datetime import datetime
 
-def extract_time(lines, max_stop):    
+def status_expansion(lines, max_stop):
     expanded_list = []
     cur_expanded = [[] for _ in range(0, max_stop)]
     prev_time = None
-    arrives = [[] for i in range(0, max_stop)]
-    departs = [[] for i in range(0, max_stop)]
     for line in lines:
         line = line.strip()
         if not line:
@@ -17,15 +15,7 @@ def extract_time(lines, max_stop):
         stop = int(stop) - 1
         if prev_time is None:
             prev_time = cur_time
-            initial_time=cur_time
 
-        if cur_time == initial_time:
-            for _ in range(0, int(nums)):
-                if int(arrived) == 1:
-                    arrives[stop].append(cur_time) 
-                else:
-                    if stop-1 >= 0:
-                        departs[stop-1].append(cur_time)
         if prev_time != cur_time:
             expanded_list.append((prev_time, cur_expanded))
             cur_expanded = [[] for i in range(0, max_stop)]
@@ -35,8 +25,29 @@ def extract_time(lines, max_stop):
 
     if prev_time:
         expanded_list.append((cur_time, cur_expanded))
+    
+    return expanded_list
 
-    prev = [None for i in range(0, max_stop)]
+def compute_augments(time, init_bus_status, max_stop):
+    # 所有未到站车，让他们出发，方便计算路段时间
+    augment_depart = [[] for i in range(0,max_stop)]
+    # 所有到站车，让他们抵达，方便计算停留时间
+    augment_arrival = [[] for i in range(0,max_stop)]
+    # 处理第一波车
+    for i in range(1, max_stop):
+        for status in init_bus_status[i]:
+            if status == 0:
+                augment_depart[i-1].append(time)
+            else:
+                augment_arrival[i].append(time)
+    return (augment_arrival, augment_depart)
+
+
+def extract_time_expanded(expanded_list, max_stop):    
+    arrives = [[] for i in range(0, max_stop)]
+    departs = [[] for i in range(0, max_stop)]
+
+    prev = [[] for i in range(0, max_stop)]
     for time, expanded in expanded_list:
         expanded_copy = copy.deepcopy(expanded)
         for i in range(0, max_stop):
@@ -77,49 +88,57 @@ def extract_time(lines, max_stop):
 
     return arrives, departs
 
+# This is for testing...(need to change tests)
+def extract_time(lines, max_stop):
+    expanded = status_expansion(lines, max_stop)
+    return extract_time_expanded(expanded, max_stop)
+
 def get_time_diff(t1, t2):
     TIME = '%Y-%m-%d %H:%M:%S'
     diff = datetime.strptime(t2, TIME) - datetime.strptime(t1, TIME)
     return diff.seconds
 
-def process_time(arrives, departs):
+def process_time(arrives, departs, max_stop):
     times = [[] for _ in range(0, max_stop)]
     for i in range(0, max_stop-1):
         for arrive_next, depart in zip(arrives[i+1], departs[i]):
             times[i].append(get_time_diff(depart, arrive_next))
     return times
 
-def stay_time(arrives, departs):
+def stay_time(arrives, departs, max_stop):
     stimes = [[] for _ in range(0, max_stop)]
     for i in range(0, max_stop):
         for arrive, depart in zip(arrives[i], departs[i]):
             stimes[i].append(get_time_diff(arrive, depart))
     return stimes
 
+def extract_time_all(lines, max_stop):
+    expanded = status_expansion(lines, max_stop)
+    time, init_bus_status = expanded[0]
+    arrive_aug, depart_aug = compute_augments(time, init_bus_status, max_stop)
+    arrives, departs = extract_time_expanded(expanded, max_stop)
+    arrives_copy = copy.deepcopy(arrives)
+    departs_copy = copy.deepcopy(departs)
+    # 计算路段时间时，添加初始离站信息
+    for i in range(0, max_stop):
+        if depart_aug[i]:
+            depart_aug[i].extend(departs_copy[i])
+            departs_copy[i] = depart_aug[i]
+    ptime = process_time(arrives, departs_copy, max_stop)
+
+    for i in range(0, max_stop):
+        if arrive_aug[i]:
+            arrive_aug[i].extend(arrives_copy[i])
+            arrives_copy[i] = arrive_aug[i] 
+    stime = stay_time(arrives_copy, departs, max_stop)
+    return (ptime, stime)
+
+
 if __name__ == '__main__':
     lines = []
     with open('buslian2.txt') as f:
         lines = f.readlines()
     max_stop = 5
-    arrives, departs = extract_time(lines, max_stop)
-    times = process_time(arrives,departs)
-    stimes = stay_time(arrives,departs)
-    print "arrive times"
-    for i in range(1, max_stop + 1):
-        print "terminal %d" % i
-        print arrives[i]
-
-    print "depart times"
-    for i in range(1, max_stop + 1):
-        print "terminal %d" % i
-        print departs[i]
-
-    print "process times"
-    for i in range(1, max_stop + 1):
-        print "terminal %d" % i
-        print times[i]
-
-    print "stay times"
-    for i in range(1, max_stop + 1):
-        print "terminal %d" % i
-        print stimes[i]
+    ptime, stime = extract_time_all(lines, max_stop)
+    print ptime
+    print stime
