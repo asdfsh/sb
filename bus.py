@@ -115,10 +115,12 @@ def stay_time(arrives, departs, max_stop):
 def extract_time_all(lines, max_stop):
     expanded = status_expansion(lines, max_stop)
     time, init_bus_status = expanded[0]
+    print expanded
     arrive_aug, depart_aug = compute_augments(time, init_bus_status, max_stop)
     arrives, departs = extract_time_expanded(expanded, max_stop)
     arrives_copy = copy.deepcopy(arrives)
     departs_copy = copy.deepcopy(departs)
+
     # 计算路段时间时，添加初始离站信息
     for i in range(0, max_stop):
         if depart_aug[i]:
@@ -131,14 +133,20 @@ def extract_time_all(lines, max_stop):
             arrive_aug[i].extend(arrives_copy[i])
             arrives_copy[i] = arrive_aug[i] 
     stime = stay_time(arrives_copy, departs, max_stop)
+   
     return (ptime, stime)
 
 
 if __name__ == '__main__':
     lines = []
-    with open('buslian2.txt') as f:
+    with open('buslian3.txt') as f:
         lines = f.readlines()
-    max_stop = 5
+    max_stop = 6
     ptime, stime = extract_time_all(lines, max_stop)
-    print ptime
-    print stime
+
+    for i in range(0, max_stop ):
+        print "process %d - %s" % (i+1,i+2)
+        print ptime[i]
+    for i in range(0, max_stop ):
+        print "terminal %d" % (i+1)
+        print stime[i]

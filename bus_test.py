@@ -135,6 +135,24 @@ class Tests(unittest.TestCase):
         ptime, stime = bus.extract_time_all(lines, 5)
         self.assertEqual(ptime, [[13],[7],[13],[7],[]])
         self.assertEqual(stime, [[],[10],[15],[10],[]])
+    def test_newbus(self):
+        lines = [
+                 '801,0,1,0,3,2017-11-03 15:52:47',
+                 '801,0,1,0,4,2017-11-03 15:52:47',
+                 '801,0,1,0,2,2017-11-03 15:53:00',#00秒出发一辆新车
+                 '801,1,1,0,3,2017-11-03 15:53:00',
+                 '801,1,1,0,4,2017-11-03 15:53:00',
+                 '801,1,1,0,2,2017-11-03 15:53:08',
+                 '801,0,1,0,4,2017-11-03 15:53:10',
+                 '801,0,1,0,5,2017-11-03 15:53:10',
+
+                 ]
+
+        ptime, stime = bus.extract_time_all(lines, 5)
+        self.assertEqual(ptime, [[8],[13],[13],[],[]])
+        self.assertEqual(stime, [[],[],[],[],[]])
+        #新车应该有第一站到第二站的ptime
+
 
 
 if __name__ == '__main__':
