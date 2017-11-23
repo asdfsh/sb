@@ -115,7 +115,6 @@ def stay_time(arrives, departs, max_stop):
 def extract_time_all(lines, max_stop):
     expanded = status_expansion(lines, max_stop)
     time, init_bus_status = expanded[0]
-    print expanded
     arrive_aug, depart_aug = compute_augments(time, init_bus_status, max_stop)
     arrives, departs = extract_time_expanded(expanded, max_stop)
     arrives_copy = copy.deepcopy(arrives)
