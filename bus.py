@@ -51,6 +51,11 @@ def extract_time_expanded(expanded_list, max_stop):
     for time, expanded in expanded_list:
         expanded_copy = copy.deepcopy(expanded)
         for i in range(0, max_stop):
+            # 处理第一站, 如果有新车从第一站出现
+            if i == 1 and expanded[i]:
+                new_delta = expanded[i].count(0) - prev[i].count(0)
+                for _ in range(0, new_delta):
+                    departs[0].append(time)
             if prev[i]:
                 prev[i].sort()
                 # 处理最后一站
