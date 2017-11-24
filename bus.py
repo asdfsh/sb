@@ -3,6 +3,7 @@
 import copy
 from datetime import datetime
 
+
 def status_expansion(lines, max_stop):
     expanded_list = []
     cur_expanded = [[] for _ in range(0, max_stop)]
@@ -12,7 +13,7 @@ def status_expansion(lines, max_stop):
         if not line:
             continue
         bus_num, arrived, nums, direction, stop, cur_time = line.split(',')
-        stop = int(stop) - 1
+        stop = int(stop)-1
         if prev_time is None:
             prev_time = cur_time
 
@@ -25,14 +26,15 @@ def status_expansion(lines, max_stop):
 
     if prev_time:
         expanded_list.append((cur_time, cur_expanded))
-    
+
     return expanded_list
+
 
 def compute_augments(time, init_bus_status, max_stop):
     # 所有未到站车，让他们出发，方便计算路段时间
-    augment_depart = [[] for i in range(0,max_stop)]
+    augment_depart = [[] for i in range(0, max_stop)]
     # 所有到站车，让他们抵达，方便计算停留时间
-    augment_arrival = [[] for i in range(0,max_stop)]
+    augment_arrival = [[] for i in range(0, max_stop)]
     # 处理第一波车
     for i in range(1, max_stop):
         for status in init_bus_status[i]:
@@ -43,7 +45,7 @@ def compute_augments(time, init_bus_status, max_stop):
     return (augment_arrival, augment_depart)
 
 
-def extract_time_expanded(expanded_list, max_stop):    
+def extract_time_expanded(expanded_list, max_stop):
     arrives = [[] for i in range(0, max_stop)]
     departs = [[] for i in range(0, max_stop)]
 
@@ -59,7 +61,7 @@ def extract_time_expanded(expanded_list, max_stop):
             if prev[i]:
                 prev[i].sort()
                 # 处理最后一站
-                if i == max_stop - 1:
+                if i == max_stop-1:
                     last_stop_delta = len(prev[i]) - len(expanded_copy[i])
                     if last_stop_delta > 0: # 有车消失
                         for _ in range(0, last_stop_delta):
@@ -70,13 +72,13 @@ def extract_time_expanded(expanded_list, max_stop):
                     if arrive_status in expanded_copy[i]:
                         expanded_copy[i].remove(arrive_status)
                         continue
-                    # bus hasn't arrived yet 
+                    # bus hasn't arrived yet
                     if arrive_status == 0:
                         # if it arrived
                         if 1 in expanded_copy[i]:
                             arrives[i].append(time)
-                            expanded_copy[i].remove(1) 
-                        # jumped a stop
+                            expanded_copy[i].remove(1)
+                            # jumped a stop
                         # TODO: fix bus reaching final stop
                         elif i+1 < max_stop and 0 in expanded_copy[i+1]:
                             arrives[i].append(time)
@@ -86,22 +88,25 @@ def extract_time_expanded(expanded_list, max_stop):
                     if arrive_status == 1:
                         # check if it departed
                         # TODO: fix bus reaching final stop
-                        if i+1 < max_stop and 0 in expanded_copy[i+1]:
+                        if i + 1 < max_stop and 0 in expanded_copy[i+1]:
                             departs[i].append(time)
-                            expanded_copy[i+1].remove(0)
+                            expanded_copy[i + 1].remove(0)
         prev = expanded
 
     return arrives, departs
+
 
 # This is for testing...(need to change tests)
 def extract_time(lines, max_stop):
     expanded = status_expansion(lines, max_stop)
     return extract_time_expanded(expanded, max_stop)
 
+
 def get_time_diff(t1, t2):
     TIME = '%Y-%m-%d %H:%M:%S'
     diff = datetime.strptime(t2, TIME) - datetime.strptime(t1, TIME)
     return diff.seconds
+
 
 def process_time(arrives, departs, max_stop):
     times = [[] for _ in range(0, max_stop)]
@@ -110,12 +115,14 @@ def process_time(arrives, departs, max_stop):
             times[i].append(get_time_diff(depart, arrive_next))
     return times
 
+
 def stay_time(arrives, departs, max_stop):
     stimes = [[] for _ in range(0, max_stop)]
     for i in range(0, max_stop):
         for arrive, depart in zip(arrives[i], departs[i]):
             stimes[i].append(get_time_diff(arrive, depart))
     return stimes
+
 
 def extract_time_all(lines, max_stop):
     expanded = status_expansion(lines, max_stop)
@@ -135,9 +142,9 @@ def extract_time_all(lines, max_stop):
     for i in range(0, max_stop):
         if arrive_aug[i]:
             arrive_aug[i].extend(arrives_copy[i])
-            arrives_copy[i] = arrive_aug[i] 
+            arrives_copy[i] = arrive_aug[i]
     stime = stay_time(arrives_copy, departs, max_stop)
-   
+
     return (ptime, stime)
 
 
@@ -148,9 +155,9 @@ if __name__ == '__main__':
     max_stop = 6
     ptime, stime = extract_time_all(lines, max_stop)
 
-    for i in range(0, max_stop ):
-        print "process %d - %s" % (i+1,i+2)
+    for i in range(0, max_stop):
+        print "process %d - %s" % (i+1, i+2)
         print ptime[i]
-    for i in range(0, max_stop ):
+    for i in range(0, max_stop):
         print "terminal %d" % (i+1)
         print stime[i]
