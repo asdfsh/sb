@@ -51,6 +51,11 @@ def extract_time_expanded(expanded_list, max_stop):
     for time, expanded in expanded_list:
         expanded_copy = copy.deepcopy(expanded)
         for i in range(0, max_stop):
+            # 处理第一站, 如果有新车从第一站出现
+            if i == 1 and expanded[i]:
+                new_delta = expanded[i].count(0) - prev[i].count(0)
+                for _ in range(0, new_delta):
+                    departs[0].append(time)
             if prev[i]:
                 prev[i].sort()
                 # 处理最后一站
@@ -119,6 +124,7 @@ def extract_time_all(lines, max_stop):
     arrives, departs = extract_time_expanded(expanded, max_stop)
     arrives_copy = copy.deepcopy(arrives)
     departs_copy = copy.deepcopy(departs)
+
     # 计算路段时间时，添加初始离站信息
     for i in range(0, max_stop):
         if depart_aug[i]:
@@ -131,14 +137,20 @@ def extract_time_all(lines, max_stop):
             arrive_aug[i].extend(arrives_copy[i])
             arrives_copy[i] = arrive_aug[i] 
     stime = stay_time(arrives_copy, departs, max_stop)
+   
     return (ptime, stime)
 
 
 if __name__ == '__main__':
     lines = []
-    with open('buslian2.txt') as f:
+    with open('buslian3.txt') as f:
         lines = f.readlines()
-    max_stop = 5
+    max_stop = 6
     ptime, stime = extract_time_all(lines, max_stop)
-    print ptime
-    print stime
+
+    for i in range(0, max_stop ):
+        print "process %d - %s" % (i+1,i+2)
+        print ptime[i]
+    for i in range(0, max_stop ):
+        print "terminal %d" % (i+1)
+        print stime[i]
