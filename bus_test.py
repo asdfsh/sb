@@ -73,15 +73,35 @@ class Tests(unittest.TestCase):
         self.assertEqual(ptime, [[15], [30], [], [], []])
         self.assertEqual(stime, [[], [0], [], [], []])
 
-    def xtest_not_process(self):
+    def test_not_process(self):
         lines = ['801,1,1,0,2,2017-11-03 15:52:32',
                  '801,1,1,0,3,2017-11-03 15:52:47',
                  '801,0,1,0,4,2017-11-03 15:53:02',]
         ptime, stime = bus.extract_time_all(lines, 5)
         self.assertEqual(ptime, [[], [15], [], [], []])
-        self.assertEqual(stime, [[], [15], [15], [], []])
-        #暂不考虑这种情况
+        self.assertEqual(stime, [[], [0], [15], [], []])
+        #考虑这种情况 并再写一个text
+    def test_not_process2(self):
+        lines = ['801,0,1,0,3,2017-11-03 15:52:32',
+                 '801,0,1,0,3,2017-11-03 15:52:47',
+                 '801,1,1,0,3,2017-11-03 15:53:00',
+                 '801,1,1,0,4,2017-11-03 15:53:17',
+                 '801,0,1,0,5,2017-11-03 15:53:27',]
+        ptime, stime = bus.extract_time_all(lines, 5)
+        self.assertEqual(ptime, [[], [28], [17], [], []])
+        self.assertEqual(stime, [[], [], [0], [10], []])
+        #考虑没有过程时间且与其他数据混合
 
+    def test_not_two_ex(self):
+        lines = ['801,0,1,0,2,2017-11-03 15:52:32',
+                 '801,0,1,0,3,2017-11-03 15:52:47',
+                 '801,1,1,0,3,2017-11-03 15:53:00',
+                 '801,1,1,0,4,2017-11-03 15:53:17',
+                 '801,0,1,0,5,2017-11-03 15:53:27', ]
+        ptime, stime = bus.extract_time_all(lines, 5)
+        self.assertEqual(ptime, [[15], [13], [17], [], []])
+        self.assertEqual(stime, [[], [0], [0], [10], []])
+        #考虑没有过程时间和没有停留时间混合
     def test_xx(self):
         print 'test xx'
         lines = ['801,0,2,0,2,2017-11-03 15:52:32',
