@@ -84,6 +84,11 @@ def extract_time_expanded(expanded_list, max_stop):
                             arrives[i].append(time)
                             departs[i].append(time)
                             expanded_copy[i+1].remove(0)
+                        elif i+1 < max_stop and 1 in expanded_copy[i+1]:
+                            arrives[i].append(time)
+                            departs[i].append(time)
+                            arrives[i+1].append(time)
+                            prev[i].remove(0)
                     # bus arrived
                     if arrive_status == 1:
                         # check if it departed
